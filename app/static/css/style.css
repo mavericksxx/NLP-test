@@ -385,4 +385,24 @@ input[type="range"]::-webkit-slider-thumb {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
+}
+
+.copying-warning {
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+}
+
+.alert {
+    padding: 1rem;
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeeba;
 } 

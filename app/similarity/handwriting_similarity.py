@@ -16,8 +16,7 @@ def compute_handwriting_similarity(pdf_path1, pdf_path2):
 
         # Get API key
         api_key = os.environ.get('GOOGLE_CLOUD_API_KEY')
-        print(f"Using Google Cloud API key: {api_key[:10]}...")
-
+        
         # Get handwriting features for both documents
         features1 = extract_handwriting_features(images1, api_key)
         features2 = extract_handwriting_features(images2, api_key)
@@ -28,11 +27,14 @@ def compute_handwriting_similarity(pdf_path1, pdf_path2):
 
         # Compare features and calculate similarity score
         similarity, feature_scores = compare_handwriting_features(features1, features2)
+        
+        # Check if handwriting is significantly different (less than 80% similar)
+        is_different_handwriting = float(similarity) < 0.80
 
-        return float(np.clip(similarity, 0, 1)), feature_scores, anomalies1, anomalies2, variations1, variations2
+        return float(np.clip(similarity, 0, 1)), feature_scores, anomalies1, anomalies2, variations1, variations2, is_different_handwriting
+        
     except Exception as e:
         print(f"Detailed error in handwriting similarity: {str(e)}")
-        print(f"API key used: {api_key[:10]}...")
         raise Exception(f"Error computing handwriting similarity: {str(e)}")
 
 def extract_handwriting_features(images, api_key):
