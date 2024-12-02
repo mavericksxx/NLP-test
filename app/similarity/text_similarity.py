@@ -54,25 +54,14 @@ class SemanticAnalyzer:
             raise
 
     def preprocess_text(self, text):
-        """Preprocess text by segmenting into paragraphs and sentences"""
+        """Preprocess text by splitting into lines"""
         try:
-            # Split into paragraphs
-            paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
-            
-            # Further split paragraphs into sentences
-            segments = []
-            for para in paragraphs:
-                try:
-                    sentences = sent_tokenize(para)
-                    segments.extend(sentences)
-                except Exception as e:
-                    print(f"Error tokenizing paragraph: {str(e)}")
-                    segments.append(para)  # Fall back to using whole paragraph
-            
-            return segments
+            # Split into lines and remove empty ones
+            lines = [line.strip() for line in text.split('\n') if line.strip()]
+            return lines
         except Exception as e:
             print(f"Error in preprocess_text: {str(e)}")
-            return [text]  # Fall back to using whole text as one segment
+            raise
 
     def get_embeddings(self, segments):
         """Get BERT embeddings for text segments"""
@@ -127,19 +116,20 @@ class SemanticAnalyzer:
         return similarity, consistency_analysis
 
     def analyze_internal_consistency(self, segments, embeddings):
-        """Analyze semantic consistency within a document"""
+        """Analyze semantic consistency within a document line by line"""
         inconsistencies = []
         
         for i in range(len(segments)-1):
             similarity = np.dot(embeddings[i], embeddings[i+1])/(np.linalg.norm(embeddings[i])*np.linalg.norm(embeddings[i+1]))
             
-            # If similarity drops below threshold, mark as potential inconsistency
-            if similarity < 0.5:  # Adjustable threshold
+            # If similarity is less than 0.05 (95% different), mark as potential inconsistency
+            if similarity < 0.05:  # Changed threshold from 0.03 to 0.05
                 inconsistencies.append({
                     'segment_index': i,
                     'segment_text': segments[i],
                     'next_segment_text': segments[i+1],
-                    'similarity_score': float(similarity)
+                    'similarity_score': float(similarity),
+                    'line_number': i + 1  # Add line number for reference
                 })
         
         return inconsistencies

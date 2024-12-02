@@ -159,33 +159,44 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Add after existing updateVariations function
-    function updateSemanticConsistency(elementId, consistencyData) {
+    function updateSemanticConsistency(elementId, inconsistencies) {
         const container = document.getElementById(elementId);
         if (!container) return;
 
-        if (!consistencyData || consistencyData.length === 0) {
-            container.innerHTML = '<div class="no-inconsistencies">No semantic inconsistencies detected</div>';
+        if (!inconsistencies || inconsistencies.length === 0) {
+            container.innerHTML = '<div class="no-inconsistencies">No significant semantic inconsistencies detected</div>';
             return;
         }
 
-        const semanticsHtml = consistencyData.map(item => {
-            const similarityClass = getSimilarityClass(item.similarity_score);
+        const inconsistenciesHtml = inconsistencies.map(inc => {
+            const similarityPercentage = (1 - inc.similarity_score) * 100;
+            const processedText = inc.segment_text.trim();
+            
+            // Check if the text contains math content
+            const hasMath = /[\\\$\[\]\{\}\_\^]/.test(processedText);
             
             return `
-                <div class="semantic-item">
-                    <div class="segment-text">${escapeHtml(item.segment_text)}</div>
-                    <div class="segment-flow">
-                        <span class="flow-arrow">↓</span>
-                        <span class="similarity-indicator ${similarityClass}">
-                            ${(item.similarity_score * 100).toFixed(1)}% similar
-                        </span>
+                <div class="inconsistency-item">
+                    <div class="line-info">Line ${inc.line_number}</div>
+                    <div class="segment-text">
+                        ${hasMath ? 
+                            `<div class="latex-content">$${escapeLatex(processedText)}$</div>` :
+                            `<div class="raw-text">${escapeHtml(processedText)}</div>`
+                        }
                     </div>
-                    <div class="segment-text">${escapeHtml(item.next_segment_text)}</div>
+                    <div class="similarity-indicator similarity-low">
+                        ${similarityPercentage.toFixed(1)}% different from next line
+                    </div>
                 </div>
             `;
         }).join('');
 
-        container.innerHTML = semanticsHtml;
+        container.innerHTML = inconsistenciesHtml;
+        
+        // Trigger MathJax to process new content
+        if (window.MathJax) {
+            MathJax.typesetPromise && MathJax.typesetPromise();
+        }
     }
 
     function getSimilarityClass(score) {
@@ -195,8 +206,24 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    function escapeLatex(text) {
+        // Don't escape already escaped sequences
+        return text
+            .replace(/(?<!\\)_/g, '\\_')
+            .replace(/(?<!\\)\^/g, '\\^')
+            .replace(/(?<!\\)%/g, '\\%')
+            .replace(/(?<!\\)&/g, '\\&')
+            .replace(/(?<!\\)\$/g, '\\$')
+            .replace(/(?<!\\)\{/g, '\\{')
+            .replace(/(?<!\\)\}/g, '\\}')
+            .replace(/(?<!\\)#/g, '\\#');
     }
 }); 

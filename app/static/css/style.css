@@ -291,10 +291,35 @@ input[type="range"]::-webkit-slider-thumb {
 }
 
 .segment-text {
-    font-size: 0.9rem;
-    color: #444;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #f3f4f6;
+    padding: 1rem;
+    border-radius: 4px;
     margin-bottom: 0.5rem;
-    line-height: 1.4;
+    overflow-x: auto;
+}
+
+.latex-content {
+    padding: 0.5rem 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+}
+
+.raw-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* MathJax specific styles */
+.MathJax {
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+}
+
+.MathJax_Display {
+    margin: 0 !important;
 }
 
 .segment-flow {
@@ -335,6 +360,20 @@ input[type="range"]::-webkit-slider-thumb {
 .no-inconsistencies {
     color: #666;
     font-style: italic;
+}
+
+.inconsistency-item {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #fff;
+}
+
+.line-info {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
 }
 
 @media (max-width: 768px) {
