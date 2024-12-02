@@ -141,11 +141,7 @@ def compute_text_similarity(text1, text2):
     analyzer = SemanticAnalyzer()
     similarity, consistency_analysis = analyzer.analyze_semantic_consistency(text1, text2)
     
-    # Add strict similarity check
-    is_highly_similar = float(similarity) > 0.97  # 97% threshold
-    
     return {
         'similarity_score': float(similarity),
-        'consistency_analysis': consistency_analysis,
-        'is_highly_similar': is_highly_similar
+        'consistency_analysis': consistency_analysis
     }

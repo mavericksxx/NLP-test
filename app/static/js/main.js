@@ -100,19 +100,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Scroll to results
             results.scrollIntoView({ behavior: 'smooth' });
 
-            // Add potential copying warning if detected
-            if (data.potential_copying) {
-                const warningDiv = document.createElement('div');
-                warningDiv.className = 'copying-warning';
-                warningDiv.innerHTML = `
-                    <div class="alert alert-warning">
-                        <strong>⚠️ Warning:</strong> The documents show very similar text content (>97% similarity) 
-                        but different handwriting characteristics. This might indicate potential content copying.
-                    </div>
-                `;
-                document.querySelector('.similarity-scores').after(warningDiv);
-            }
-
         } catch (error) {
             console.error('Error:', error);
             alert(error.message || 'An error occurred during analysis');
